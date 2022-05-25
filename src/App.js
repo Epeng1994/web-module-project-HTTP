@@ -30,6 +30,7 @@ const App = (props) => {
     axios.delete(`http://localhost:9000/api/movies/${id}`)
       .then(res=>{
         setMovies(res.data)
+        setFavoriteMovies(favoriteMovies.filter(a=>a.id !== id))
       })
       .catch(err=>{
         console.log(err)
@@ -38,6 +39,13 @@ const App = (props) => {
   }
 
   const addToFavorites = (movie) => {
+    //console.log(movie)
+    
+    if(favoriteMovies.find(a=> a.id === movie.id) === undefined || favoriteMovies.length === 0){
+      setFavoriteMovies([...favoriteMovies, movie])
+    }else{
+      alert('You already favorited that movie')
+    }
     
   }
 
@@ -51,26 +59,19 @@ const App = (props) => {
         <MovieHeader/>
         <div className="row ">
           <FavoriteMovieList favoriteMovies={favoriteMovies}/>
-        
           <Switch>
             <Route exact path="/movies/add">
               <AddMovieForm setMovies={setMovies}/>
             </Route>
-
             <Route exact path="/movies/edit/:id">
               <EditMovieForm setMovies={setMovies}/>
             </Route>
-
             <Route exact path="/movies/:id">
-              <Movie deleteMovie={deleteMovie}/>
+              <Movie deleteMovie={deleteMovie} addToFavorites ={addToFavorites}/>
             </Route>
-
             <Route exact path="/movies">
               <MovieList movies={movies}/>
             </Route>
-
-
-
             <Route path="/">
               <Redirect to="/movies"/>
             </Route>
