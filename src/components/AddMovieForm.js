@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
+import uuid from 'react-uuid'
 import axios from 'axios';
 
-const EditMovieForm = (props) => {
+const AddMovieForm = (props) => {
 	const { push } = useHistory();
-	const { id } = useParams()
+	const id = uuid()
 
 	const { setMovies } = props;
 	const [movie, setMovie] = useState({
@@ -26,11 +26,19 @@ const EditMovieForm = (props) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.put(`http://localhost:9000/api/movies/${id}`, movie)
+        let clone = {
+            id: id,
+            title:movie.title,
+            director: movie.director,
+            genre: movie.genre,
+            metascore: movie.metascore,
+            description: movie.description
+        }
+        axios.post(`http://localhost:9000/api/movies`, clone)
             .then(res=>{
 				//console.log(res.data)
 				setMovies(res.data)
-				push(`/movies${id}`)
+                push('/')
 			})
 			.catch(err=>{
 				console.log(err);
@@ -39,31 +47,12 @@ const EditMovieForm = (props) => {
 	
 	const { title, director, genre, metascore, description } = movie;
 
-
-	useEffect(()=>{
-		axios.get(`http://localhost:9000/api/movies/${id}`, movie)
-            .then(res=>{
-				let clone = {
-					title:res.data.title,
-					director: res.data.director,
-					genre: res.data.genre,
-					metascore: res.data.metascore,
-					description: res.data.description
-				}
-				setMovie(clone)
-			})
-			.catch(err=>{
-				console.log(err);
-			})
-	},[])
-
-
     return (
 	<div className="col">
 		<div className="modal-content">
 			<form onSubmit={handleSubmit}>
 				<div className="modal-header">						
-					<h4 className="modal-title">Editing <strong>{movie.title}</strong></h4>
+					<h4 className="modal-title">Adding Movie</h4>
 				</div>
 				<div className="modal-body">					
 					<div className="form-group">
@@ -97,4 +86,4 @@ const EditMovieForm = (props) => {
 	</div>);
 }
 
-export default EditMovieForm;
+export default AddMovieForm;
